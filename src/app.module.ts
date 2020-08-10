@@ -6,12 +6,14 @@ import { AppService } from './app.service';
 import { typeOrmConfig } from './config/typeorm.config';
 import {SwaggerModule} from '@nestjs/swagger';
 import { TaskModule } from './task/task.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
   ConfigModule.forRoot({envFilePath: '.env', expandVariables: true,}),
   TypeOrmModule.forRoot(typeOrmConfig),
   TaskModule,
-  SwaggerModule
+  SwaggerModule,
+  AuthModule
 ],
   controllers: [AppController],
   providers: [AppService],

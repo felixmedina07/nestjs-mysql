@@ -82,20 +82,20 @@ export class TaskController {
 
     @Delete('/:taskID')
     async deletedTask(@Res() res,@Param('taskID') taskID:number): Promise<void>{
-        try{
-            const found = await this.taskService.getTask(taskID);
-            if(found){
+       try{
+            const found = await this.taskService.deleteTask(taskID);
+            if(found) {
                 const task = getRepository(Task).delete(taskID);
                 res.status(HttpStatus.OK).json({
                     task,
                     message: 'tarea borrada',
-                    statusCode: 202
+                    statusCode: 204
                 })
-            }else{
-                res.status(HttpStatus.FOUND).json({
-                    statusCode:500,
+             } else {
+                res.status(HttpStatus.NOT_FOUND).json({
+                    statusCode:HttpStatus.NOT_FOUND,
                     error: found,
-                    message:'error'
+                    message:'error fatal'
                 })
             }
         }catch(e){
