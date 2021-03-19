@@ -16,6 +16,6 @@ import {
     @Column({type:"varchar",length:30,nullable:false, unique:false})
     email: string;
 
-    @Column({type:"varchar",length:12,nullable:false})
+    @Column({type:"varchar",length:100,nullable:false})
     password: string;
   }

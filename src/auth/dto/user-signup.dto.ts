@@ -1,10 +1,22 @@
-import {IsString, Matches, MaxLength, MinLength} from 'class-validator';
+import {
+  IsString,
+  MaxLength,
+  MinLength,
+  IsEmail,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class UserSignupDTO {
-    @IsString()
-    @MinLength(4)
-    @MaxLength(30)
-    username: string;
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(4)
+  @MaxLength(30)
+  username: string;
 
-    
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
 }

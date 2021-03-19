@@ -1,19 +1,19 @@
-import { NestFactory, } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {SwaggerModule,DocumentBuilder} from '@nestjs/swagger';
-import {ConfigService} from '@nestjs/config';
+import { Logger, ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
+  const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  const options = new DocumentBuilder()
-  .setTitle('Cats example')
-  .setDescription('The cats API description')
-  .setVersion('1.0')
-  .addTag('cats')
-  .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
-  await app.listen(3000);
-  console.log(process.env.HOSTNAME);
+  if (process.env.NODE_ENV === 'development') app.enableCors();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
+  app.setGlobalPrefix('api/v1');
+  const port = 4000;
+  await app.listen(process.env.PORT || port);
+  logger.log(`Application listening on port ${port}`);
 }
 bootstrap();

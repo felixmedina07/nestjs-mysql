@@ -4,6 +4,7 @@ import {CreateTaskDTO,UpdateTaskDTO} from './dto/task.dto';
 import { getRepository } from 'typeorm';
 import { Task } from './task.entity';
 import { async } from 'rxjs';
+import {validate} from 'class-validator';
 @Controller('task')
 export class TaskController {
     constructor(private taskService:TaskService){}
@@ -21,9 +22,16 @@ export class TaskController {
 
     @Get('/:taskID')
     async getTask(@Res() res ,@Param('taskID') taskID:number){
-        const taskOne = await this.taskService.getTask(taskID);
-        if(taskOne)  return res.status(HttpStatus.OK).json(taskOne);
-        if(!taskOne)  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:'error'});
+        await this.taskService.getTask(taskID)
+        .then((taskOne) => {
+            if(taskOne) {
+                return res.status(HttpStatus.OK).json(taskOne)
+            };
+            if(!taskOne)  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:'error'});
+        })
+        .catch((e) => {
+           return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:e.message});
+        })
     }
 
     @Post('/')
@@ -40,16 +48,15 @@ export class TaskController {
     @Put('/:taskID')
     async updateTask(@Res() res, @Param('taskID') taskID:number,@Body() updateTaskDTO: UpdateTaskDTO){
         try{
-            const found = await this.taskService.getTask(taskID);
-            if(found){
-                getRepository(Task).merge(found,updateTaskDTO);
-                const task = await getRepository(Task).save(found);
+            const task = await this.taskService.updateTask(taskID,updateTaskDTO);
+            if(validate(task)){
                 res.status(HttpStatus.OK).json({
                     task,
                     message: 'tarea actualizada',
                     statusCode: 202
                 })
-            }else{
+            }
+            if(!task){
                 res.status(HttpStatus.FOUND).json({
                     statusCode:500,
                     message:'error'
@@ -61,23 +68,6 @@ export class TaskController {
                message:e.message
            })
         }
-    
-       // .then((task) => {
-        //     res.status(HttpStatus.OK).json({
-        //         task,
-        //         message: 'tarea actualizada',
-        //         statusCode: 202
-        //         })
-        // })
-
-        // if(task){
-        //     res.status(HttpStatus.OK).json({
-        //         task,
-        //         message: 'tarea actualizada',
-        //         statusCode: 202
-        //     })
-        // }
-        // if(!task) throw new NotFoundException('Task Does not updated');
     }
 
     @Delete('/:taskID')
