@@ -20,3 +20,11 @@ export class UserSignupDTO {
   @IsNotEmpty()
   password: string;
 }
+export class UserSigninDTO {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
